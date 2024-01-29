@@ -1,6 +1,19 @@
 from setuptools import setup
 
-import imp
+import importlib.util
+import importlib.machinery
+
+def load_source(modname, filename):
+    # From: https://docs.python.org/3.12/whatsnew/3.12.html#imp
+    loader = importlib.machinery.SourceFileLoader(modname, filename)
+    spec = importlib.util.spec_from_file_location(modname, filename, loader=loader)
+    module = importlib.util.module_from_spec(spec)
+    # The module is always executed and not cached in sys.modules.
+    # Uncomment the following line to cache the module.
+    # sys.modules[module.__name__] = module
+    loader.exec_module(module)
+    return module
+
 _version = imp.load_source("pynmea2._version", "pynmea2/_version.py")
 
 setup(
